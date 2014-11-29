@@ -94,7 +94,7 @@ public class TestDFA {
         /**
          * 3.1
          */
-         System.out.println("Esercizio 2.3.");
+         System.out.println("Esercizio 3.1.");
         DFA dfa31 = new DFA(5);
         //Aggiungi le transizioni all'automa
         dfa31.setMove(0, '0', 1);
@@ -112,50 +112,56 @@ public class TestDFA {
         dfa31.addFinalState(3);
         System.out.println(dfa31.toDot());
         System.out.println("Stati raggiungibili da 0" + dfa31.reach(0).toString());
+        System.out.println("Samples: " + dfa31.sample().toString());
        
-        /*System.out.println("Stati raggiungibili da 2" + dfa31.reach(2).toString());
+        System.out.println("Stati raggiungibili da 2" + dfa31.reach(2).toString());
         System.out.println("Stati raggiungibili da 1" + dfa31.reach(1).toString());
         System.out.println("Stati raggiungibili da 3" + dfa31.reach(3).toString());
         System.out.println("Stati raggiungibili da 4" + dfa31.reach(4).toString());
         System.out.println(dfa31.empty()? "- Riconosce il linguaggio vuoto" : "- Non riconosce il linguaggio vuoto");
-        System.out.println(dfa31.empty());
         System.out.println("Stati Pozzo"+dfa31.sink().toString());
 
-   */
+   
         
-        
-        DFA d = new DFA(10);
+         /**
+         * 3.1
+         */
+         System.out.println("Esercizio 3.2.");
+        DFA dfa32 = new DFA(10);
         //Aggiungi le transizioni all'automa
-        d.setMove(0, '0', 1);
-        d.setMove(0, '1', 4);
-        d.setMove(0, '2', 2);
-        d.setMove(3, '0', 1);
-        d.setMove(7, '0', 3);
-        d.setMove(9, '0', 0);
-        d.setMove(5, '0', 2);
-        d.setMove(5, '1', 8);
-        d.setMove(6, '0', 5);
-        d.addFinalState(5);
-        d.addFinalState(7);
-        d.addFinalState(7);
-        System.out.println(d.toDot());
-        System.out.println("Stati raggiungibili da 0" + d.reach(0).toString());
-        System.out.println("Stati raggiungibili da 1" + d.reach(1).toString());
-        System.out.println("Stati raggiungibili da 2" + d.reach(2).toString());
-        System.out.println("Stati raggiungibili da 3" + d.reach(3).toString());
-        System.out.println("Stati raggiungibili da 4" + d.reach(4).toString());
-        System.out.println("Stati raggiungibili da 5" + d.reach(5).toString());
-        System.out.println("Stati raggiungibili da 6" + d.reach(6).toString());
-        System.out.println("Stati raggiungibili da 7" + d.reach(7).toString());
-        System.out.println("Stati raggiungibili da 8" + d.reach(8).toString());
-        System.out.println("Stati raggiungibili da 9" + d.reach(9).toString());
-        System.out.println("aaaa" + d.sample()[1]);
-        System.out.println("aaaa" + d.sample()[2]);
-        System.out.println("aaaa" + d.sample()[3]);
-        System.out.println("aaaa" + d.sample()[4]);
-        System.out.println("aaaa" + d.sample()[5]);
-        System.out.println("aaaa" + d.sample()[9]);
-
+        dfa32.setMove(0, '0', 1);
+        dfa32.setMove(0, '1', 4);
+        dfa32.setMove(0, '2', 2);
+        dfa32.setMove(2, '2', 2);
+        dfa32.setMove(2, '1', 1);
+        dfa32.setMove(1, '0', 1);
+        dfa32.setMove(1, '1', 6);
+        dfa32.setMove(3, '0', 1);
+        dfa32.setMove(4, '0', 7);
+        dfa32.setMove(4, '1', 1);
+        dfa32.setMove(7, '0', 3);
+        dfa32.setMove(9, '0', 0);
+        dfa32.setMove(5, '0', 2);
+        dfa32.setMove(5, '1', 8);
+        dfa32.setMove(6, '0', 5);
+        dfa32.addFinalState(5);
+        dfa32.addFinalState(7);
+        dfa32.addFinalState(7);
+        dfa32.addFinalState(2);
+        System.out.println(dfa32.toDot());
+        System.out.println("Stati raggiungibili da 0" + dfa32.reach(0).toString());
+        System.out.println("Stati raggiungibili da 1" + dfa32.reach(1).toString());
+        System.out.println("Stati raggiungibili da 2" + dfa32.reach(2).toString());
+        System.out.println("Stati raggiungibili da 3" + dfa32.reach(3).toString());
+        System.out.println("Stati raggiungibili da 4" + dfa32.reach(4).toString());
+        System.out.println("Stati raggiungibili da 5" + dfa32.reach(5).toString());
+        System.out.println("Stati raggiungibili da 6" + dfa32.reach(6).toString());
+        System.out.println("Stati raggiungibili da 7" + dfa32.reach(7).toString());
+        System.out.println("Stati raggiungibili da 8" + dfa32.reach(8).toString());
+        System.out.println("Stati raggiungibili da 9" + dfa32.reach(9).toString());
+        System.out.println(dfa32.empty()? "- Riconosce il linguaggio vuoto" : "- Non riconosce il linguaggio vuoto");
+        System.out.println("Stati Pozzo"+dfa32.sink().toString());
+        System.out.println("Samples: " + dfa32.sample().toString());
 
      
 

@@ -1,6 +1,5 @@
 package dfa2;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -252,7 +251,6 @@ public class DFA {
         HashSet<Integer> raggiungibili = reach(0);
         //raggiungibili contera la intersezione tra raggiungibili e finalStates
         raggiungibili.retainAll(finalStates);
-        System.out.println("Intersezione: " + raggiungibili.toString());
         //se la intersezione tra raggiungibili e finalStates e vuoto allora l'automa riconosce il linguaggio vuoto
         if (raggiungibili.isEmpty()) {
             return true;
@@ -310,21 +308,32 @@ public class DFA {
      *
      */
     public HashSet<Integer> reach(int q) {
+        //espanso contiene tutti i stati che sono stati visitati
         HashSet<Integer> espanso = new HashSet<>();
+        //r[i] = true se esiste un camino da q a ialtrimenti r[i] = false
         boolean[] r = new boolean[numberOfStates];
         r[q] = true;
-        int numeroStatiScoperti = 1;
-        while (numeroStatiScoperti > 0) {
-            for (int i = 0; i < numberOfStates; i++) {
+        //numeroStatiInesplorati contiene tutti i stati inesplorati che sono come 
+        //risultato di una transizione dallo stato q con qualche simbolo e non sono stati espansi
+        int numeroStatiInesplorati = 1;
+        //Loop finche non sono piu stati da esplorare
+        while (numeroStatiInesplorati > 0) {
+            //per ogni stato dell'automa si esplora stato i se è accessibile da q e non e stato esplorato
+            for (int i = 0; i < numberOfStates ; i++) {
                 if (r[i] == true && !espanso.contains(i)) {
-                    numeroStatiScoperti--;
+                    numeroStatiInesplorati--;
                     espanso.add(i);
+                    //mappa: partendo da stato i e leggendo simbolo c -> stato
                     HashMap<Character, Integer> possibleTransitions = getTransitions(i);
+                    //Se ci sono transizioni dallo stato i legendo qualunque simbolo
                     if (!possibleTransitions.isEmpty()) {
                         for (Character key : possibleTransitions.keySet()) {
+                            //si aggiunge a r[j] = true se esiste transizione da i a j
                             r[move(i, key)] = true;
+                            // se esiste transizione da i a i legendo simbolo c, ed i è gia stato esplorato, 
+                            // i non è considerato como uno stato inesplorato
                             if (!espanso.contains(possibleTransitions.get(key))) {
-                                numeroStatiScoperti++;
+                                numeroStatiInesplorati++;
                             }
                         }
                     }
@@ -381,8 +390,9 @@ public class DFA {
      * false per marcare gli stati irraggiungibili.
      *
      */
-    public String[] sample() {
+    public HashSet<String> sample() {
         HashSet<Integer> espanso = new HashSet<>();
+        HashSet<String> result = new HashSet<>();
         String[] r = new String[numberOfStates];
         r[0] = "";
         for (int i = 1; i < numberOfStates; i++) {
@@ -397,14 +407,7 @@ public class DFA {
                     HashMap<Character, Integer> possibleTransitions = getTransitions(i);
                     if (!possibleTransitions.isEmpty()) {
                         for (Character key : possibleTransitions.keySet()) {
-                            if (r[move(i, key)] != null) {
-                                String temp = r[move(i, key)];
-                                System.out.println("1keyyy "+key);
-                                r[move(i, key)] = temp + Character.toString(key);
-                            } else {
-                                r[move(i, key)] = "";
-                                System.out.println("keyyy "+key);
-                            }
+                                r[move(i, key)] = r[i] + Character.toString(key);
                             if (!espanso.contains(possibleTransitions.get(key))) {
                                 numeroStatiScoperti++;
                             }
@@ -413,7 +416,11 @@ public class DFA {
                 }
             }
         }
-        return r;
+        for (int i = 0; i < numberOfStates; i++) {
+            if(finalStates.contains(i))
+                result.add(r[i]);
+        }
+        return result;
     }
 
     /**
