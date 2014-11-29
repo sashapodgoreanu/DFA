@@ -397,7 +397,8 @@ public class DFA {
         r[0] = "";
         for (int i = 1; i < numberOfStates; i++) {
             r[i] = null;
-        }
+        } 
+        
         int numeroStatiScoperti = 1;
         while (numeroStatiScoperti > 0) {
             for (int i = 0; i < numberOfStates; i++) {
