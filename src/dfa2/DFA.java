@@ -315,15 +315,10 @@ public class DFA {
         r[q] = true;
         int numeroStatiScoperti = 1;
         while (numeroStatiScoperti > 0) {
-            System.out.println("1 numeroStatiScoperti " + numeroStatiScoperti);
             for (int i = 0; i < numberOfStates; i++) {
-                System.out.println("for: " + r[i] + " " + espanso.contains(i));
-                System.out.println("2 numeroStatiScoperti " + numeroStatiScoperti);
                 if (r[i] == true && !espanso.contains(i)) {
                     numeroStatiScoperti--;
-                    System.out.println("3 numeroStatiScoperti " + numeroStatiScoperti);
                     espanso.add(i);
-                    System.out.println("espanso " + espanso.toString());
                     HashMap<Character, Integer> possibleTransitions = getTransitions(i);
                     if (!possibleTransitions.isEmpty()) {
                         for (Character key : possibleTransitions.keySet()) {
@@ -335,8 +330,6 @@ public class DFA {
                     }
                 }
             }
-            System.out.println("OUT OF FOR ");
-
         }
         return espanso;
     }
@@ -388,11 +381,41 @@ public class DFA {
      * false per marcare gli stati irraggiungibili.
      *
      */
-     public HashSet<String> sample() {
-     ArrayList<String> campioni = new ArrayList<>();
-     String esempi[] = new String[numberOfStates];
-     return new HashSet<>();
-     }
+    public String[] sample() {
+        HashSet<Integer> espanso = new HashSet<>();
+        String[] r = new String[numberOfStates];
+        r[0] = "";
+        for (int i = 1; i < numberOfStates; i++) {
+            r[i] = null;
+        }
+        int numeroStatiScoperti = 1;
+        while (numeroStatiScoperti > 0) {
+            for (int i = 0; i < numberOfStates; i++) {
+                if (r[i] != null && !espanso.contains(i)) {
+                    numeroStatiScoperti--;
+                    espanso.add(i);
+                    HashMap<Character, Integer> possibleTransitions = getTransitions(i);
+                    if (!possibleTransitions.isEmpty()) {
+                        for (Character key : possibleTransitions.keySet()) {
+                            if (r[move(i, key)] != null) {
+                                String temp = r[move(i, key)];
+                                System.out.println("1keyyy "+key);
+                                r[move(i, key)] = temp + Character.toString(key);
+                            } else {
+                                r[move(i, key)] = "";
+                                System.out.println("keyyy "+key);
+                            }
+                            if (!espanso.contains(possibleTransitions.get(key))) {
+                                numeroStatiScoperti++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return r;
+    }
+
     /**
      * <p>
      * A convenience class to represent name-value pairs.</p>
