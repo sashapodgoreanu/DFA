@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -389,50 +388,18 @@ public class DFA {
      * false per marcare gli stati irraggiungibili.
      *
      */
-    /*
      public HashSet<String> sample() {
      ArrayList<String> campioni = new ArrayList<>();
      String esempi[] = new String[numberOfStates];
-     for (int i = 0; i < numberOfStates; i++) {
-     esempi[i] = null;
+     return new HashSet<>();
      }
-     esempi[0] = "";
-     boolean[] visitati = new boolean[numberOfStates];//contiene un array degli stati. visitati[i]= true se si è verificato la raggiungibilita per lo stato i
-     int i = 0;
-     while (i < numberOfStates && esempi[i] != null) {
-     if (visitati[i] == true) {
-     i++;
-     } else {
-     //per lo stato i si crea una mappa con tutte le transizioni possibili (simbolo, stato)
-     HashMap<Character, Integer> possibleTransitions = getTransitions(i);
-
-     int min = i;
-     if (!possibleTransitions.isEmpty()) {
-     visitati[i] = true;
-     //per tutte le posibile transizioni partendo dallo sato i si calcola lo stato risultante j è si pone r[j] = true e si aggiunge j ai stati raggiungibili
-     for (Character key : possibleTransitions.keySet()) {
-     if (move(i, key) != -1) {
-     r[move(i, key)] = true;
-     raggiungibili.add(move(i, key));
-     if (move(i, key) < min) {
-     min = move(i, key);
-     }
-     }
-     }
-     }
-     i = min;// i = lo stato con indice minimo raggiungibile.
-     }
-
-     }
-     return campioni;
-     }*/
     /**
      * <p>
      * A convenience class to represent name-value pairs.</p>
      *
      * @since JavaFX 2.0
      */
-    private class Pair<K, V> implements Serializable {
+    private static class Pair<K, V> {
 
         /**
          * Key of this <code>Pair</code>.
