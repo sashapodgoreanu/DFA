@@ -149,6 +149,12 @@ public class TestDFA {
         System.out.println("Stati raggiungibili da 7" + d.reach(7).toString());
         System.out.println("Stati raggiungibili da 8" + d.reach(8).toString());
         System.out.println("Stati raggiungibili da 9" + d.reach(9).toString());
+        System.out.println("aaaa" + d.sample()[1]);
+        System.out.println("aaaa" + d.sample()[2]);
+        System.out.println("aaaa" + d.sample()[3]);
+        System.out.println("aaaa" + d.sample()[4]);
+        System.out.println("aaaa" + d.sample()[5]);
+        System.out.println("aaaa" + d.sample()[9]);
 
 
      
