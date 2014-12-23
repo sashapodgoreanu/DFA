@@ -162,6 +162,8 @@ public class TestDFA {
         System.out.println(dfa32.empty()? "- Riconosce il linguaggio vuoto" : "- Non riconosce il linguaggio vuoto");
         System.out.println("Stati Pozzo"+dfa32.sink().toString());
         System.out.println("Samples: " + dfa32.sample().toString());
+        dfa32.completeDFA();
+        System.out.println(dfa32.toDot());
 
      
 
