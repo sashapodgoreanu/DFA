@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Un oggetto della calsse DFA rapresenta un automa a stati finiti
@@ -423,7 +424,28 @@ public class DFA {
         }
         return result;
     }
+    
+    public void completeDFA(){
+        numberOfStates++;
+        for (int i = 0; i < numberOfStates; i++) {
+            HashMap<Character,Integer> transizionOfi = getTransitions(i);
+            Set<Character> keys = transizionOfi.keySet();
+            HashSet<Character> allKeys = alphabet();
+            for (Character verify: allKeys) {
+                if(!keys.contains(verify)){
+                    setMove(i,verify,numberOfStates-1);
+                }
+            }
+        }
+    }
 
+    
+    
+    
+    
+    
+    
+    
     /**
      * <p>
      * A convenience class to represent name-value pairs.</p>
