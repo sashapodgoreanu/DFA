@@ -165,7 +165,42 @@ public class TestDFA {
         dfa32.completeDFA();
         System.out.println(dfa32.toDot());
 
-     
+        /**
+         * 4.1
+         */
+        System.out.println("Esercizio 4.1.");
+        DFA dfa41 = new DFA(5);
+        dfa41.setMove(0, 'a', 1);
+        dfa41.setMove(0, 'b', 2);
+        dfa41.setMove(1, 'b', 3);
+        dfa41.setMove(1, 'a', 4);
+        dfa41.setMove(2, 'a', 3);
+        dfa41.setMove(2, 'b', 4);
+        dfa41.addFinalState(3);
+        dfa41.addFinalState(4);
+        dfa41.completeDFA();
+
+        DFA dfa42 = new DFA(5);
+        dfa42.setMove(0, 'a', 1);
+        dfa42.setMove(0, 'b', 3);
+        dfa42.setMove(1, 'b', 2);
+        dfa42.setMove(1, 'a', 4);
+        dfa42.setMove(3, 'a', 2);
+        dfa42.setMove(3, 'b', 4);
+        dfa42.addFinalState(2);
+        dfa42.addFinalState(4);
+        dfa42.completeDFA();
+        
+        System.out.println(dfa41.equivalentTo(dfa42));
+        
+        dfa41.minimize();
+        dfa42 = dfa42.minimize2();
+
+        System.out.println(dfa41.toDot());
+        System.out.println(dfa42.toDot());
+        System.out.println(dfa42.reach(1));
+        System.out.println(dfa41.reach(1));
+
 
     }
 

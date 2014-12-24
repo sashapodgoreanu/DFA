@@ -206,12 +206,12 @@ public class DFA {
                 lista.put(pair, listCharToAdd);
             }
         }
-        System.out.println("********************************************");
+        //System.out.println("********************************************");
         for (Map.Entry<Pair<Integer, Integer>, ArrayList<Character>> coppia : lista.entrySet()) {
             Pair<Integer, Integer> pairToStamp = coppia.getKey();
-            System.out.println(pairToStamp.toString() + " : " + coppia.getValue().toString());
+            //System.out.println(pairToStamp.toString() + " : " + coppia.getValue().toString());
         }
-        System.out.println("********************************************");
+        //System.out.println("********************************************");
 
         for (Map.Entry<Pair<Integer, Integer>, ArrayList<Character>> coppia : lista.entrySet()) {
             Pair<Integer, Integer> coppiaStati = coppia.getKey();
@@ -314,15 +314,13 @@ public class DFA {
         //r[i] = true se esiste un camino da q a ialtrimenti r[i] = false
         boolean[] r = new boolean[numberOfStates];
         r[q] = true;
-        //numeroStatiInesplorati contiene tutti i stati inesplorati che sono come 
-        //risultato di una transizione dallo stato q con qualche simbolo e non sono stati espansi
-        int numeroStatiInesplorati = 1;
+        boolean nuovoStato = true;
         //Loop finche non sono piu stati da esplorare
-        while (numeroStatiInesplorati > 0) {
+        while (nuovoStato) {
             //per ogni stato dell'automa si esplora stato i se è accessibile da q e non e stato esplorato
-            for (int i = 0; i < numberOfStates ; i++) {
+            for (int i = 0; i < numberOfStates; i++) {
                 if (r[i] == true && !espanso.contains(i)) {
-                    numeroStatiInesplorati--;
+                    nuovoStato = false;
                     espanso.add(i);
                     //mappa: partendo da stato i e leggendo simbolo c -> stato
                     HashMap<Character, Integer> possibleTransitions = getTransitions(i);
@@ -334,7 +332,7 @@ public class DFA {
                             // se esiste transizione da i a i legendo simbolo c, ed i è gia stato esplorato, 
                             // i non è considerato como uno stato inesplorato
                             if (!espanso.contains(possibleTransitions.get(key))) {
-                                numeroStatiInesplorati++;
+                                nuovoStato = true;
                             }
                         }
                     }
@@ -398,8 +396,8 @@ public class DFA {
         r[0] = "";
         for (int i = 1; i < numberOfStates; i++) {
             r[i] = null;
-        } 
-        
+        }
+
         int numeroStatiScoperti = 1;
         while (numeroStatiScoperti > 0) {
             for (int i = 0; i < numberOfStates; i++) {
@@ -409,7 +407,7 @@ public class DFA {
                     HashMap<Character, Integer> possibleTransitions = getTransitions(i);
                     if (!possibleTransitions.isEmpty()) {
                         for (Character key : possibleTransitions.keySet()) {
-                                r[move(i, key)] = r[i] + Character.toString(key);
+                            r[move(i, key)] = r[i] + Character.toString(key);
                             if (!espanso.contains(possibleTransitions.get(key))) {
                                 numeroStatiScoperti++;
                             }
@@ -419,33 +417,195 @@ public class DFA {
             }
         }
         for (int i = 0; i < numberOfStates; i++) {
-            if(finalStates.contains(i))
+            if (finalStates.contains(i)) {
                 result.add(r[i]);
+            }
         }
         return result;
     }
-    
-    public void completeDFA(){
+
+    public void completeDFA() {
         numberOfStates++;
         for (int i = 0; i < numberOfStates; i++) {
-            HashMap<Character,Integer> transizionOfi = getTransitions(i);
+            HashMap<Character, Integer> transizionOfi = getTransitions(i);
             Set<Character> keys = transizionOfi.keySet();
             HashSet<Character> allKeys = alphabet();
-            for (Character verify: allKeys) {
-                if(!keys.contains(verify)){
-                    setMove(i,verify,numberOfStates-1);
+            for (Character verify : allKeys) {
+                if (!keys.contains(verify)) {
+                    setMove(i, verify, numberOfStates - 1);
                 }
             }
         }
     }
 
+    public void minimize() {
+        //1-allocare la matrice
+        boolean[][] eq = new boolean[numberOfStates][numberOfStates];
+        //eq[i][j] = true se i e j sono stati entrambi finali o entrambi nonfinali
+        for (int i = 0; i < numberOfStates; i++) {
+            for (int j = 0; j < numberOfStates; j++) {
+                if (finalStates.contains(i)) {
+                    if (finalStates.contains(j)) {
+                        eq[i][j] = true;
+                    } else {
+                        eq[i][j] = false;
+                    }
+                } else if (finalStates.contains(j)) {
+                    eq[i][j] = false;
+                } else {
+                    eq[i][j] = true;
+                }
+            }
+        }
+
+        //per ogni ch: eq[i][j] = false dove eq[move(i,ch)][move(j,ch)]= false.
+        HashSet<Character> alfabeto = alphabet();
+        boolean newEq = true;
+        while (newEq) {
+            newEq = false;
+            for (int i = 0; i < numberOfStates; i++) {
+                for (int j = 0; j < numberOfStates; j++) {
+                    for (Character ch : alfabeto) {
+                        if (eq[i][j] == true  && eq[move(i, ch)][move(j, ch)] == false) {
+                            eq[i][j] = false;
+                            eq[j][i] = false;
+                            newEq = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // fix equivalenze. Se esiste eq[1][2] = true allora eq[1][1] = false ed eq[2][2] = false
+        for (int i = 0; i < numberOfStates; i++) {
+            for (int j = 0; j < numberOfStates; j++) {
+                if (eq[i][j] == true && i != j) {
+                    eq[i][i] = eq[j][j] = false;
+                }
+            }
+        }
+
+        //riempi array con equivalenze
+        ArrayList<Pair<Integer, Integer>> m = new ArrayList<>();
+        for (int i = 0; i < numberOfStates; i++) {
+            for (int j = 0; j <= i; j++) {
+                if (eq[i][j] == true) {
+                    Pair<Integer, Integer> p = new Pair(i, j);
+                    m.add(p);
+                }
+            }
+        }
+
+        //crea DFA nuova minima 
+        DFA minima = new DFA(m.size());
+        for (Pair<Integer,Integer> i : m) {
+            for (Character ch : alphabet()) {
+                int dest = move(i.getValue(), ch);
+                for (int k = 0; k < m.size(); k++) {
+                    if(m.get(k).getKey() == dest || m.get(k).value == dest){
+                        minima.setMove(m.indexOf(i), ch, k);
+                    }
+                }
+            }
+            if (finalStates.contains(i.getValue())) {
+                minima.addFinalState(m.indexOf(i));
+            }
+        }
+        //rende this minima
+        this.finalStates = minima.finalStates;
+        this.numberOfStates = minima.numberOfStates;
+        this.transitions = minima.transitions;
+    }
+
+    public DFA minimize2() {
+        //PASSO 1: inizializzazione della tabella (matrice) dell'algoritmo
+        int n = numberOfStates;
+        boolean[][] eq = new boolean[n][n];		//matrice di boolean usata nell'algoritmo "riempi-tabella"
+        for (int i = 0; i < n; i++) {					//scorro tutti gli elementi della matrice con gli indici i e j per inizializzarli
+            for (int j = 0; j < n; j++) {
+                if (finalState(i) && finalState(j) || !finalState(i) && !finalState(j)) {
+                    eq[i][j] = true;				//se gli stati i e j sono entrambi finali
+                } else //o entrambi non finali li marco come non distinguibili (true)
+                {
+                    eq[i][j] = false;				//altrimenti li marco come stati distinguibili (false)
+                }
+            }
+        }
+        //PASSO 2: esecuzione dell'algoritmo di minimizzazione che modifica e completa la tabella
+        HashSet<Character> input = alphabet();		//ottengo l'alfabeto dei caratteri in input per l'automa
+        boolean newCoupleFind = true;				//booleano di supporto: indica la presenza di una nuova coppia di stati da controllare
+        while (newCoupleFind) {						//finchè scopro nuove coppie di stati da valutare...
+            newCoupleFind = false;
+            for (int i = 0; i < n; i++) {				//scorro gli elementi della matrice
+                for (int j = 0; j < n; j++) {
+                    for (Character ch : input) {	    //per tutti i possibili caratteri dell'alfabeto in input
+                        if (eq[i][j] == true && eq[move(i, ch)][move(j, ch)] == false) {	//se due stati i e j sono non distinguibili fra loro, ma leggendo
+                            eq[i][j] = false;											//ch a partire da i e j arrivo in una coppia di stati distinguibili,
+                            newCoupleFind = true;										//allora anche i e j sono a loro volta distinguibili
+                        }
+                    }
+                }
+            }
+        }
+        //PASSO 3: creazione dell'automa minimo
+        int m[] = new int[n];						//vettore di supporto per indicare le classi di equivalenza degli stati. Ogni elemento di m rappresenta uno stato dell'automa di partenza
+        for (int i = 0; i < n; i++) {					//scorro il vettore e la matrice.
+            boolean rappMinTrovato = false;			//Scegliamo come rappresentate canonico di una classe di equivalenza lo stato della classe con indice piu' piccolo
+            //il booleano indica se per ogni stato l'ho gia' trovato
+            for (int j = 0; j < n; j++) {
+                if (eq[i][j] == true) {				//se gli stati i e j dell'automa originale non sono distinguibili...
+                    if (j <= i && !rappMinTrovato) {	//se j è uno stato con indice minore/uguale a i e non ho ancora trovato il rappresentante di indice minimo...
+                        m[i] = j;					//imposto j come rappresentatne canonico per lo stato i
+                        rappMinTrovato = true;		//ho trovato il rappresentante per i
+                    }
+                }
+            }
+        }
+        //PASSO 3.1: definizione delle transazioni e degli stati finali dell'automa minimizzato
+        int k = getMax(m);							//trovo il rappresentante con indice massimo
+        if (k != m.length) {							//se il rappresentante con indice max è diverso da m.length (cioè dal numero degli stati dell'automa originale)...
+            DFA minDfa = new DFA(k + 1);				//allora l'automa è minimizzabile e avra' k+1 stati
+            for (int i = 0; i < m.length; i++) {		//scorro l'array dei rappresentati
+                for (Character ch : input) {			//per tutti i caratteri in input
+                    int j = move(i, ch);				//metto in j la destinazione della mossa a partire dallo stato i leggendo ch
+                    if (validState(j)) //se la mossa è valida
+                    {
+                        minDfa.setMove(m[i], ch, m[j]);	//allora nel nuovo automa ci sara' una transizione da dal rappresentante di i a quello di j etichettata ch
+                    }
+                }
+                if (finalState(i)) //se lo stato i dell'automa originale era finale
+                {
+                    minDfa.addFinalState(m[i]);		//allora lo sara' anche la classe di equivalenza a cui appartiene
+                }
+            }
+            return minDfa;							//restituisco l'automa
+        }
+        return this;								//se l'automa non è minimizzabile lo sostituisco cosi' com'è
+    }
     
+    public boolean equivalentTo(DFA automa){
+		if(!this.alphabet().equals(automa.alphabet()))				//se i DFA hanno alfabeti diversi, sicuramente riconoscono linguaggi distinti
+			return false;											//e pertanto non sono equivalenti
+		DFA dfa1 = this.minimize2();									//altrimenti minimizzo entrambi gli automi
+		DFA dfa2 = automa.minimize2();
+		if(!dfa1.getTransitions().equals(dfa2.getTransitions()))	//confronto le transazioni degli automi minimi ottenuti
+			return false;											//se sono diverse i DFA non sono equivalenti
+		return true;		//se non sono entrato negli if, allora i DFA sono equivalenti
+	}
     
-    
-    
-    
-    
-    
+
+    //metodo di supporto per cercare il valore max in un array
+    private int getMax(int[] array) {
+        int max = array[0];
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] > max) {
+                max = array[i];
+            }
+        }
+        return max;
+
+    }
+
     /**
      * <p>
      * A convenience class to represent name-value pairs.</p>
@@ -492,7 +652,7 @@ public class DFA {
             this.key = key;
             this.value = value;
         }
-
+        
         /**
          * <p>
          * <code>String</code> representation of this <code>Pair</code>.</p>
@@ -563,6 +723,11 @@ public class DFA {
             }
             return false;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "DFA{" + "numberOfStates=" + numberOfStates + ", finalStates=" + finalStates + ", transitions=" + transitions + '}';
     }
 
 }
