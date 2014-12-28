@@ -438,6 +438,9 @@ public class DFA {
         }
     }
 
+    /**
+     * Metodo che implementa il algoritmo minimize. Il metodo minimiza un DFA modificando la struttura del'automa.
+     */
     public void minimize() {
         //1-allocare la matrice
         boolean[][] eq = new boolean[numberOfStates][numberOfStates];
@@ -587,8 +590,8 @@ public class DFA {
 		if(!this.alphabet().equals(automa.alphabet()))				//se i DFA hanno alfabeti diversi, sicuramente riconoscono linguaggi distinti
 			return false;											//e pertanto non sono equivalenti
 		DFA dfa1 = this.minimize2();									//altrimenti minimizzo entrambi gli automi
-		DFA dfa2 = automa.minimize2();
-		if(!dfa1.getTransitions().equals(dfa2.getTransitions()))	//confronto le transazioni degli automi minimi ottenuti
+		automa = automa.minimize2();
+		if(!dfa1.getTransitions().equals(automa.getTransitions()))	//confronto le transazioni degli automi minimi ottenuti
 			return false;											//se sono diverse i DFA non sono equivalenti
 		return true;		//se non sono entrato negli if, allora i DFA sono equivalenti
 	}

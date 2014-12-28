@@ -167,39 +167,62 @@ public class TestDFA {
 
         /**
          * 4.1
+         * 4.2
          */
         System.out.println("Esercizio 4.1.");
-        DFA dfa41 = new DFA(5);
+        DFA dfa41 = new DFA(6);
         dfa41.setMove(0, 'a', 1);
         dfa41.setMove(0, 'b', 2);
         dfa41.setMove(1, 'b', 3);
         dfa41.setMove(1, 'a', 4);
         dfa41.setMove(2, 'a', 3);
         dfa41.setMove(2, 'b', 4);
+        
+        dfa41.setMove(4, 'a', 5);
+        dfa41.setMove(4, 'b', 5);
+        dfa41.setMove(3, 'a', 5);
+        dfa41.setMove(3, 'b', 5);
+        
+        dfa41.setMove(5, 'a', 5);
+        dfa41.setMove(5, 'b', 5);
+        
         dfa41.addFinalState(3);
         dfa41.addFinalState(4);
-        dfa41.completeDFA();
+        dfa41.addFinalState(5);
+        //dfa41.completeDFA();
+         System.out.println(dfa41.toDot());
 
-        DFA dfa42 = new DFA(5);
+        DFA dfa42 = new DFA(6);
         dfa42.setMove(0, 'a', 1);
         dfa42.setMove(0, 'b', 3);
         dfa42.setMove(1, 'b', 2);
         dfa42.setMove(1, 'a', 4);
         dfa42.setMove(3, 'a', 2);
         dfa42.setMove(3, 'b', 4);
+        
+        dfa42.setMove(4, 'a', 5);
+        dfa42.setMove(4, 'b', 5);
+        dfa42.setMove(2, 'a', 5);
+        dfa42.setMove(2, 'b', 5);
+        
+        dfa42.setMove(5, 'a', 5);
+        dfa42.setMove(5, 'b', 5);
+        
         dfa42.addFinalState(2);
         dfa42.addFinalState(4);
-        dfa42.completeDFA();
-        
-        System.out.println(dfa41.equivalentTo(dfa42));
-        
-        dfa41.minimize();
-        dfa42 = dfa42.minimize2();
+        dfa42.addFinalState(5);
+        //dfa42.completeDFA();
 
-        System.out.println(dfa41.toDot());
         System.out.println(dfa42.toDot());
-        System.out.println(dfa42.reach(1));
-        System.out.println(dfa41.reach(1));
+        
+        
+        System.out.println("Gli automi sono equivalenti?: "+dfa41.equivalentTo(dfa42));
+        System.out.println("dfa41: "+dfa41.minimize2().toString());
+        System.out.println("dfa42: "+dfa42.minimize2().toString());
+        
+
+        
+        
 
 
     }

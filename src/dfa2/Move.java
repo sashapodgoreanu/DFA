@@ -54,5 +54,12 @@ public class Move {
     public char getCh() {
         return ch;
     }
+
+    @Override
+    public String toString() {
+        return start + "{"+ ch+"}" ;
+    }
+    
+    
   
 }
