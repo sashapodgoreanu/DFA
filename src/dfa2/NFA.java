@@ -200,7 +200,10 @@ public class NFA {
     public HashSet<Integer> move(HashSet<Integer> s, char ch) {
         HashSet<Integer> qset = new HashSet<Integer>();
         for (int p : s) {
-            qset.addAll(move(p, ch));
+            System.out.println("from " + p + " with symbols:" + s.toString() + "to:" + move(p, ch));
+            if (move(p, ch) != null) {
+                qset.addAll(move(p, ch));
+            }
         }
         return qset;
     }
@@ -233,11 +236,11 @@ public class NFA {
         HashSet<Integer> epsilonClosure = new HashSet<Integer>();
         epsilonClosure.add(p); //aggiunge questo stato alla chiusura
         for (Move move : transitions.keySet()) { //Se lo stato p ha una transizione epsilon a uno stato q, q si aggiunge a epsilonClosure.
-                                                 //Se lo stato q ha a sua volta una transizione epsilon a un'altro stato z allora si chiama ricorsivamente epsilonClosure(z)
-            if(move.start == p && move.ch == NFA.EPSILON){
-                HashSet<Integer> res = move(p,NFA.EPSILON);
-                for(Integer result:res){
-                    if (move(result,NFA.EPSILON) != null && !epsilonClosure.contains(result)){
+            //Se lo stato q ha a sua volta una transizione epsilon a un'altro stato z allora si chiama ricorsivamente epsilonClosure(z)
+            if (move.start == p && move.ch == NFA.EPSILON) {
+                HashSet<Integer> res = move(p, NFA.EPSILON);
+                for (Integer result : res) {
+                    if (move(result, NFA.EPSILON) != null && !epsilonClosure.contains(result)) {
                         epsilonClosure.addAll(epsilonClosure(result));
                     }
                 }
@@ -245,6 +248,25 @@ public class NFA {
             }
         }
         return epsilonClosure;
+    }
+
+    /**
+     *
+     */
+    public static NFA nth(int n) {
+        NFA automa = new NFA(n + 1);
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = i; j < n; j++) {
+                automa.addMove(i, EPSILON, j);
+                automa.addMove(i, '0', j);
+                automa.addMove(i, '1', j);
+            }
+        }
+        for (int i = 0; i < n; i++) {
+            automa.addMove(i, '1', n);
+        }
+        automa.addFinalState(n);
+        return automa;
     }
 
     /**

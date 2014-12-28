@@ -441,7 +441,7 @@ public class DFA {
     /**
      * Metodo che implementa il algoritmo minimize. Il metodo minimiza un DFA modificando la struttura del'automa.
      */
-    public void minimize() {
+    public DFA minimize() {
         //1-allocare la matrice
         boolean[][] eq = new boolean[numberOfStates][numberOfStates];
         //eq[i][j] = true se i e j sono stati entrambi finali o entrambi nonfinali
@@ -515,10 +515,17 @@ public class DFA {
             }
         }
         //rende this minima
+        return minima;
+    }
+    
+    public void minimizeMe(){
+        DFA minima = this.minimize();
         this.finalStates = minima.finalStates;
         this.numberOfStates = minima.numberOfStates;
         this.transitions = minima.transitions;
     }
+    
+    
 
     public DFA minimize2() {
         //PASSO 1: inizializzazione della tabella (matrice) dell'algoritmo

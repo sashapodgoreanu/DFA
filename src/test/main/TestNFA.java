@@ -34,6 +34,12 @@ public class TestNFA {
         System.out.println(nfa5.move(0, 'a'));
         System.out.println(nfa5.epsilonClosure(5));
         System.out.println(nfa5.epsilonClosure(nfa5.move(0, 'b')));
+        System.out.println(nfa5.dfa().toDot());
+        System.out.println(nfa5.dfa().minimize().toDot());
+        
+        System.out.println("alfabet"+NFA.nth(3).alphabet().toString());
+        System.out.println(NFA.nth(3).dfa().minimize().toDot());
+        //System.out.println(NFA.nth(3).dfa());
     }
     
 }

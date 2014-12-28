@@ -169,7 +169,7 @@ public class TestDFA {
          * 4.1
          * 4.2
          */
-        System.out.println("Esercizio 4.1.");
+        System.out.println("Esercizio 4.1. da completare");
         DFA dfa41 = new DFA(6);
         dfa41.setMove(0, 'a', 1);
         dfa41.setMove(0, 'b', 2);
