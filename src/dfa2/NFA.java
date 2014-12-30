@@ -1,5 +1,6 @@
 package dfa2;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Stack;
@@ -200,7 +201,6 @@ public class NFA {
     public HashSet<Integer> move(HashSet<Integer> s, char ch) {
         HashSet<Integer> qset = new HashSet<Integer>();
         for (int p : s) {
-            System.out.println("from " + p + " with symbols:" + s.toString() + "to:" + move(p, ch));
             if (move(p, ch) != null) {
                 qset.addAll(move(p, ch));
             }
@@ -223,6 +223,47 @@ public class NFA {
         return qset;
     }
 
+    /* Esercizio 5.1
+     * Calcola la epsilon chiusura di uno stato dell'automa facendo riferimento all'algoritmo in Tabella 3 sul pdf Esercizi.
+     * E' un caso specifico del metodo precedente.
+     * @param p  Insieme di cui calcolare l'epsilon chiusura.
+     * @return Insieme di stati raggiungibili da p per mezzo di zero o più epsilon transizioni.
+     * @see #epsilonClosure
+     */
+    public HashSet<Integer> epsilonClosure(int p) {
+        boolean[] r = new boolean[numberOfStates];	  				//array di booleani associati agli stati dell'automa
+        HashSet<Integer> s = new HashSet<Integer>();  				//HashSet da riempiere e restituire al termine
+        HashSet<Character> input = alphabet();		  				//ottengo l'alfabeto dei caratteri in input per l'automa
+        for (int i = 0; i < r.length; i++) {							//inizializzo l'array degli stati:
+            if (i == p) {												//false = stato non raggiungibile per mezzo di EPSILON-transizioni a partire da q, true = altrimenti
+                r[i] = true;						  				//lo stato q è sempre raggiungibile con EPSILON-transizioni da sè stesso
+                s.add(i);											//aggiungo i ad s (ogni stato i è raggiungibile da sè stesso con una EPSILON-transizione)
+            } else {
+                r[i] = false;    					  				//assumiamo inizialmente che tutti gli altri stati non siano raggiungibili da q
+            }
+        }
+        boolean newStateFound = true;				  				//booleano di supporto: indica la presenza di nuovi stati da valutare
+        while (newStateFound) //ciclo finchè ho nuovi stati per i quali devo valutare la raggiungibilità
+        {
+            newStateFound = false;					  				//all'inizio di ogni ciclo non ho ancora trovato nuovi stati
+            for (int i = 0; i < r.length; i++) {		  				//scorro tutto l'array dei booleani associati agli stati dell'automa
+                if (r[i] == true) {					  				//se l'elemento i-esimo dell'array è true significa che lo stato i è raggiungibile per mezzo di EPSIOLN-transizioni
+                    HashSet<Integer> states = move(i, EPSILON);		//eseguo la mossa leggendo EPSILON a partire dallo stato i e metto in states l'insieme degli stati di destinazione ottenuto
+                    if (states != null && !states.isEmpty()) {							//se la mossa è valida (insieme non vuoto)...
+                        for (Integer j : states) {					//per tutti gli stati dell'insieme ottenuto...
+                            if (validState(j) && !s.contains(j)) {	//se lo stato j è valido e non l'ho già aggiunto all'hashset s
+                                newStateFound = true;				//ho trovato almeno un nuovo stato da controllare
+                                r[j] = true;						//marco j come raggiungibile
+                                s.add(j);							//aggiungo j all'HashSet degli stati raggiungibili
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return s;
+    }
+
     /**
      * Calcola la epsilon chiusura di uno stato dell'automa. E` un caso
      * specifico del metodo precedente.
@@ -231,25 +272,21 @@ public class NFA {
      * @return Insieme di stati raggiungibili da <code>p</code> per mezzo di
      * zero o piu` epsilon transizioni.
      * @see #epsilonClosure
-     */
-    public HashSet<Integer> epsilonClosure(int p) {
-        HashSet<Integer> epsilonClosure = new HashSet<Integer>();
-        epsilonClosure.add(p); //aggiunge questo stato alla chiusura
-        for (Move move : transitions.keySet()) { //Se lo stato p ha una transizione epsilon a uno stato q, q si aggiunge a epsilonClosure.
-            //Se lo stato q ha a sua volta una transizione epsilon a un'altro stato z allora si chiama ricorsivamente epsilonClosure(z)
-            if (move.start == p && move.ch == NFA.EPSILON) {
-                HashSet<Integer> res = move(p, NFA.EPSILON);
-                for (Integer result : res) {
-                    if (move(result, NFA.EPSILON) != null && !epsilonClosure.contains(result)) {
-                        epsilonClosure.addAll(epsilonClosure(result));
-                    }
-                }
-                epsilonClosure.addAll(res);
-            }
-        }
-        return epsilonClosure;
+     *
+     * public HashSet<Integer> epsilonClosure(int p) { //
+     * System.out.println("p="+p); HashSet<Integer> epsilonClosure = new
+     * HashSet<Integer>(); epsilonClosure.add(p); //aggiunge questo stato alla
+     * chiusura for (Move move : transitions.keySet()) { //Se lo stato p ha una
+     * transizione epsilon a uno stato q, q si aggiunge a epsilonClosure. //Se
+     * lo stato q ha a sua volta una transizione epsilon a un'altro stato z
+     * allora si chiama ricorsivamente epsilonClosure(z) if (move.start == p &&
+     * move.ch == NFA.EPSILON) { HashSet<Integer> res = move(p, NFA.EPSILON);
+     * for (Integer result : res) { if (move(result, NFA.EPSILON) != null &&
+     * !epsilonClosure.contains(result)) {
+     * epsilonClosure.addAll(epsilonClosure(result)); } }
+     * epsilonClosure.addAll(res); } } return epsilonClosure;
     }
-
+     */
     /**
      *
      */
@@ -317,6 +354,70 @@ public class NFA {
         }
 
         return dfa;
+    }
+
+    /**
+     * Uninone di due automi NFA
+     *
+     * @param a auta da fare unione con automa this
+     * @return numero di stati della automa unione
+     */
+    public int append(NFA a) {
+        final int n = numberOfStates;
+        numberOfStates += a.numberOfStates();
+        for (Move m : a.transitions.keySet()) {
+            for (int q : a.transitions.get(m)) {
+                addMove(n + m.start, m.ch, n + q);
+            }
+        }
+        return n;
+    }
+
+    public String toDot() {
+        String diGraph = "digraph NFA{\n";
+        diGraph = diGraph + "node [color=blue4, shape = circle]; \n";
+        diGraph = diGraph + "rankdir=LR; \n";
+        diGraph = diGraph + "secret_node [style=invis] \n";
+        if (!transitions.isEmpty()) {
+            diGraph = diGraph + "secret_node -> 0;\n";
+        }
+        for (int i = 0; i < this.numberOfStates; i++) {
+            for (int j = 0; j < this.numberOfStates; j++) {
+                if (validMove(i, j)) {
+                    ArrayList<Character> listaChar = new ArrayList<>();
+                    //
+                    if (move(i, NFA.EPSILON) != null && move(i, NFA.EPSILON).contains(j)) {
+                        listaChar.add('e');
+                    }
+                    for (Character ch : alphabet()) {
+                        if (move(i, ch) != null && move(i, ch).contains(j)) {
+                            listaChar.add(ch);
+                        }
+                    }
+                    diGraph = diGraph + i + " -> " + j + "[label = <<font color=\"darkgreen\">" + listaChar.toString() + "</font>>]; \n";
+                }
+            }
+        }
+        for (Integer toEnd : finalStates) {
+            diGraph = diGraph + toEnd + " [shape = \"doublecircle\"]; \n";
+        }
+        diGraph = diGraph + "}";
+        return diGraph;
+    }
+
+    private boolean validMove(int a, int b) {
+        if (move(a, NFA.EPSILON) != null && move(a, NFA.EPSILON).contains(b)) {
+            //System.out.println("YES validMove:"+a+"ch="+"e"+"->"+b);
+            return true;
+        }
+        for (Character ch : alphabet()) {
+            if (move(a, ch) != null && move(a, ch).contains(b)) {
+                //System.out.println("YES validMove:"+a+"ch="+ch+"->"+b);
+                return true;
+            }
+        }
+        //System.out.println("NOT validMove:"+a+"->"+b);
+        return false;
     }
 
     @Override

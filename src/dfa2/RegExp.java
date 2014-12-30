@@ -2,7 +2,7 @@
 package dfa2;
 
 /**
- * Interfaccia che denota una Espressione Regolare
+ * Interfaccia che rapresenta una Espressione Regolare
  * @author SashaAlexandru
  */
 public interface RegExp {

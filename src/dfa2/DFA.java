@@ -439,7 +439,7 @@ public class DFA {
     }
 
     /**
-     * Metodo che implementa il algoritmo minimize. Il metodo minimiza un DFA modificando la struttura del'automa.
+     * Metodo che implementa il algoritmo minimize.
      */
     public DFA minimize() {
         //1-allocare la matrice
@@ -514,7 +514,6 @@ public class DFA {
                 minima.addFinalState(m.indexOf(i));
             }
         }
-        //rende this minima
         return minima;
     }
     
